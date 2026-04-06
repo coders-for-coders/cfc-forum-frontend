@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import ReduxStoreProvider from "@/store/storeProvider";
-import { NavBar } from "@/components/navbar/NavBar";
 import AuthWrapper from "@/components/auth/authWrapper";
+import { Navbar } from "@/components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,19 +17,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Coders For Coders",
-  description: "comming soon....",
+  title: "Coders Forum",
+  description: "A community for developers to share knowledge and connect",
 };
 
 export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} dark antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-black text-slate-100 antialiased`}
       >
         <ReduxStoreProvider>
           <AuthWrapper>
-            <NavBar />
+            <Navbar />
             {children}
           </AuthWrapper>
         </ReduxStoreProvider>

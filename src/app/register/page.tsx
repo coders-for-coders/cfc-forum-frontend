@@ -19,9 +19,11 @@ import { Separator } from "@/components/ui/separator"
 
 import Link from "next/link"
 import { FaDiscord, FaGithub } from "react-icons/fa"
+import Image from "next/image"
 
 import api from "@/lib/api"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
 
 const formSchema = z.object({
     email: z.string()
@@ -48,6 +50,7 @@ const formSchema = z.object({
 
 export default function RegisterPage() {
     const router = useRouter()
+    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -68,112 +71,144 @@ export default function RegisterPage() {
                 JSON.stringify(dataToSend)
             )
             if (response.status === 201) {
-                router.push("/")
-            } else {
-
+                toast({
+                    title: "Success",
+                    description: "Registration successful! Please log in.",
+                });
+                router.push("/login")
             }
-
-        } catch (error) {
-            console.error('Registration error:', error);
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error.response?.data?.message || "Registration failed",
+                variant: "destructive"
+            });
         }
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center">
-            <div className="bg-slate-900 p-8 rounded-lg w-[500px]">
-                <h1 className="text-center font-bold text-xl pb-4">Register</h1>
-
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="fullname"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Full Name</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="username"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Username</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} type="email" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="flex gap-4">
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <PasswordInput {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="confirmPassword"
-                                render={({ field }) => (
-                                    <FormItem className="flex-1">
-                                        <FormLabel>Confirm Password</FormLabel>
-                                        <FormControl>
-                                            <PasswordInput {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                <div className="bg-slate-900 rounded-lg shadow-xl p-8 border border-slate-800">
+                    <div className="text-center mb-8">
+                        <div className="flex justify-center mb-4">
+                            <Image
+                                src="/logo.png"
+                                alt="CFC Forum Logo"
+                                width={48}
+                                height={48}
+                                className="rounded-lg"
                             />
                         </div>
+                        <h1 className="text-2xl font-bold text-slate-100 mb-2">Create an Account</h1>
+                        <p className="text-slate-400">Join our coding community</p>
+                    </div>
 
-                        <FormDescription className="pt-5">
-                            <Button type="submit" className="w-full">Register</Button>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="fullname"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-slate-300">Full Name</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} className="bg-slate-800 border-slate-700 text-slate-100 focus:border-slate-600" />
+                                        </FormControl>
+                                        <FormMessage className="text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="username"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-slate-300">Username</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} className="bg-slate-800 border-slate-700 text-slate-100 focus:border-slate-600" />
+                                        </FormControl>
+                                        <FormMessage className="text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-slate-300">Email</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} type="email" className="bg-slate-800 border-slate-700 text-slate-100 focus:border-slate-600" />
+                                        </FormControl>
+                                        <FormMessage className="text-red-400" />
+                                    </FormItem>
+                                )}
+                            />
 
-                            <Separator className="mt-3 mb-4" />
-                            <p className="justify-center flex">or continue with</p>
-                            <div className="p-4 flex gap-6 items-center justify-center">
-                                <Link href={`${process.env.NODE_ENV === 'production' 
-                                    ? process.env.NEXT_PUBLIC_PROD_BACKEND_URL 
-                                    : process.env.NEXT_PUBLIC_DEV_BACKEND_URL}/api/auth/github`}>
-                                    <FaGithub size={24} />
-                                </Link>
-                                <Link href={`${process.env.NODE_ENV === 'production'
-                                    ? process.env.NEXT_PUBLIC_PROD_BACKEND_URL
-                                    : process.env.NEXT_PUBLIC_DEV_BACKEND_URL}/api/auth/discord`}>
-                                    <FaDiscord size={24} />
-                                </Link>
+                            <div className="flex gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel className="text-slate-300">Password</FormLabel>
+                                            <FormControl>
+                                                <PasswordInput {...field} className="bg-slate-800 border-slate-700 text-slate-100 focus:border-slate-600" />
+                                            </FormControl>
+                                            <FormMessage className="text-red-400" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="confirmPassword"
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel className="text-slate-300">Confirm Password</FormLabel>
+                                            <FormControl>
+                                                <PasswordInput {...field} className="bg-slate-800 border-slate-700 text-slate-100 focus:border-slate-600" />
+                                            </FormControl>
+                                            <FormMessage className="text-red-400" />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
-                        </FormDescription>
-                    </form>
-                </Form>
+
+                            <FormDescription className="pt-5">
+                                <Button type="submit" className="w-full bg-slate-800 hover:bg-slate-700 text-slate-100">
+                                    Create Account
+                                </Button>
+
+                                <Separator className="mt-6 mb-4 bg-slate-700" />
+                                <p className="text-center text-slate-400 mb-4">or continue with</p>
+                                <div className="flex gap-6 items-center justify-center">
+                                    <Link href={`${process.env.NODE_ENV === 'production' 
+                                        ? process.env.NEXT_PUBLIC_PROD_BACKEND_URL 
+                                        : process.env.NEXT_PUBLIC_DEV_BACKEND_URL}/api/auth/github`}
+                                        className="text-slate-400 hover:text-slate-200 transition-colors">
+                                        <FaGithub size={24} />
+                                    </Link>
+                                    <Link href={`${process.env.NODE_ENV === 'production'
+                                        ? process.env.NEXT_PUBLIC_PROD_BACKEND_URL
+                                        : process.env.NEXT_PUBLIC_DEV_BACKEND_URL}/api/auth/discord`}
+                                        className="text-slate-400 hover:text-slate-200 transition-colors">
+                                        <FaDiscord size={24} />
+                                    </Link>
+                                </div>
+                            </FormDescription>
+                        </form>
+                    </Form>
+
+                    <div className="mt-6 text-center">
+                        <p className="text-slate-400">
+                            Already have an account?{' '}
+                            <Link href="/login" className="text-slate-300 hover:text-slate-100 font-medium">
+                                Sign in
+                            </Link>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     )
